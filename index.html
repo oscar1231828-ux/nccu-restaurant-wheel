@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#8f3829">
+<title>政大吃什麼｜今天呷啥？</title>
+<style>
+:root{
+  --brick:#963f2e;--brick-dark:#6f2d23;--cream:#f5e8ce;--paper:#fff8e9;
+  --ink:#38281f;--green:#657a55;--gold:#e7bf72;--line:#d8c19b;--muted:#7d6a58;
+  --shadow:0 8px 0 rgba(81,43,26,.10),0 15px 30px rgba(81,43,26,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;z-index:-1;background-image:radial-gradient(#a57d50 .7px,transparent .7px);background-size:7px 7px}
+button,select,input{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.topbar{background:var(--brick-dark);color:#fff0d0;padding:10px 16px;text-align:center;font-size:.8rem;letter-spacing:.12em}
+.wrap{width:min(1120px,calc(100% - 28px));margin:0 auto}
+.hero{padding:26px 0 18px;text-align:center}
+.stamp{display:inline-block;border:2px solid var(--brick);color:var(--brick);padding:4px 12px;transform:rotate(-2deg);font-size:.78rem;font-weight:900;letter-spacing:.08em}
+h1{font-size:clamp(2.5rem,7vw,5rem);line-height:1;margin:16px 0 10px;color:var(--brick-dark);font-weight:1000;letter-spacing:.06em;text-shadow:2px 2px 0 #e8c68c}
+.subtitle{margin:0;color:#6c5140;font-size:.98rem}
+.hero-icons{font-size:1.45rem;margin-top:12px;letter-spacing:.5rem}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start;padding-bottom:42px}
+.panel,.main-card,.result-card{background:var(--paper);border:2px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.panel{padding:18px;position:sticky;top:12px}
+.section-title{display:flex;align-items:center;gap:8px;color:var(--brick-dark);font-size:1.1rem;font-weight:900;margin:0 0 14px}
+.section-title .icon{background:var(--brick);color:#fff0d0;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;font-size:.85rem}
+.field{margin:0 0 17px}
+.field label,.field legend{font-weight:850;font-size:.88rem;display:block;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;padding:6px 10px;font-size:.82rem;background:#fffdf7;transition:.15s}
+.chip input:checked+span{background:var(--brick);border-color:var(--brick);color:#fff4d9;box-shadow:0 2px 0 #6f2d23}
+.chip input:focus-visible+span{outline:3px solid #dca94c;outline-offset:2px}
+select,input[type=number]{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:10px 11px;background:#fffdf7;color:var(--ink)}
+.toggle-row{display:flex;gap:8px;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:#fffdf7;padding:8px 10px;border-radius:9px;font-size:.87rem}
+.toggle input{accent-color:var(--brick)}
+.btn{border:0;border-radius:10px;padding:12px 15px;font-weight:900;transition:transform .12s,filter .12s}
+.btn:active{transform:translateY(2px)}
+.btn-primary{background:var(--brick);color:#fff3d7;box-shadow:0 4px 0 var(--brick-dark)}
+.btn-secondary{background:#e9d5ad;color:var(--brick-dark);border:1.5px solid #c8a873}
+.btn-ghost{background:transparent;color:var(--brick);border:1.5px dashed #bd8e6c}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+.full{width:100%}
+.note{font-size:.76rem;line-height:1.55;color:var(--muted);margin:10px 0 0}
+.main-card{padding:18px;overflow:hidden}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.counter{font-weight:900;color:var(--brick-dark)}
+.counter small{font-weight:500;color:var(--muted)}
+.status-pill{background:#e7d7b7;color:#68452e;padding:5px 9px;border-radius:999px;font-size:.75rem;font-weight:800}
+.wheel-stage{display:grid;place-items:center;padding:10px 0 16px;position:relative}
+.pointer{position:absolute;top:1px;z-index:5;width:0;height:0;border-left:17px solid transparent;border-right:17px solid transparent;border-top:32px solid var(--brick-dark);filter:drop-shadow(0 2px 1px #fff)}
+.wheel-shell{width:min(100%,540px);aspect-ratio:1;position:relative;display:grid;place-items:center}
+#wheel{width:100%;height:100%;display:block;filter:drop-shadow(0 5px 0 rgba(90,49,26,.13))}
+.wheel-center{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:76px;height:76px;border-radius:50%;background:var(--paper);border:5px solid var(--brick-dark);display:grid;place-items:center;color:var(--brick-dark);font-weight:1000;box-shadow:0 2px 0 #b98d4d;pointer-events:none;text-align:center;line-height:1.1}
+.wheel-center span{font-size:.8rem}
+.wheel-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:460px;margin:0 auto}
+.result-card{margin-top:18px;padding:18px;display:none;border-color:var(--brick);position:relative}
+.result-card.show{display:block;animation:pop .25s ease-out}
+@keyframes pop{from{transform:translateY(7px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.result-kicker{font-size:.76rem;color:var(--brick);font-weight:900;letter-spacing:.1em}
+.result-card h2{margin:5px 0 10px;color:var(--brick-dark);font-size:1.6rem;overflow-wrap:anywhere}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.tag{background:#eaddbf;border-radius:5px;padding:4px 8px;font-size:.8rem}
+.result-details{display:grid;gap:8px;font-size:.9rem;line-height:1.5}
+.result-details div{display:flex;gap:8px}
+.result-details b{min-width:76px;color:#76523c}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.message{display:none;margin:12px 0 0;padding:12px;border:1.5px dashed #bf8a5d;border-radius:9px;background:#fff1d8;color:#70402c;font-size:.88rem;line-height:1.5}
+.message.show{display:block}
+.list-panel{margin-top:18px;background:#f9efd9;border:1.5px dashed var(--line);border-radius:10px;padding:12px}
+.list-panel summary{cursor:pointer;font-weight:900;color:var(--brick-dark)}
+.restaurant-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.restaurant-item{background:#fffaf0;border:1px solid #e3d0ad;border-radius:8px;padding:9px;font-size:.82rem;min-width:0}
+.restaurant-item strong{display:block;overflow-wrap:anywhere}
+.restaurant-item small{display:block;color:var(--muted);line-height:1.45;margin-top:3px}
+.restaurant-item.out{opacity:.45}
+footer{padding:18px 0 30px;text-align:center;color:var(--muted);font-size:.76rem;line-height:1.7}
+.source-links a{color:var(--brick)}
+.hidden{display:none!important}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.panel{position:static}.hero{padding-top:22px}.main-card{padding:12px}.wheel-center{width:62px;height:62px;border-width:4px}.wheel-center span{font-size:.68rem}}
+@media(max-width:430px){.wrap{width:calc(100% - 18px)}.restaurant-list{grid-template-columns:1fr}.wheel-actions{grid-template-columns:1fr}.panel{padding:14px}.result-actions .btn{flex:1}.hero-icons{letter-spacing:.25rem}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="topbar">國立政治大學周邊美食指南・吃飯這種大事，交給命運</div>
+<header class="hero wrap">
+  <span class="stamp">政大美食研究所・第 001 號</span>
+  <h1>今天呷啥？</h1>
+  <p class="subtitle">選擇困難免驚惶，轉一圈就有答案。</p>
+  <div class="hero-icons" aria-hidden="true">🍜 🍱 🥟 🧋</div>
+</header>
+
+<main class="wrap layout">
+  <aside class="panel" aria-label="餐廳篩選條件">
+    <h2 class="section-title"><span class="icon">✎</span>先選一下，等等吃啥</h2>
+    <div class="field">
+      <label>① 今天想吃什麼？（可複選）</label>
+      <div class="chips" id="categoryChips">
+        <label class="chip"><input type="checkbox" value="台式"><span>台式</span></label>
+        <label class="chip"><input type="checkbox" value="日式"><span>日式</span></label>
+        <label class="chip"><input type="checkbox" value="韓式"><span>韓式</span></label>
+        <label class="chip"><input type="checkbox" value="火鍋"><span>火鍋</span></label>
+        <label class="chip"><input type="checkbox" value="麵食"><span>麵食</span></label>
+        <label class="chip"><input type="checkbox" value="便當"><span>便當</span></label>
+        <label class="chip"><input type="checkbox" value="早餐"><span>早餐</span></label>
+        <label class="chip"><input type="checkbox" value="飲料／甜點"><span>飲料／甜點</span></label>
+        <label class="chip"><input type="checkbox" value="異國料理"><span>異國料理</span></label>
+        <label class="chip"><input type="checkbox" value="速食"><span>速食</span></label>
+        <label class="chip"><input type="checkbox" value="素食"><span>素食</span></label>
+      </div>
+      <p class="note">不選分類就代表「不限」。分類可複選，例如台式＋麵食。</p>
+    </div>
+    <div class="field">
+      <label for="budget">② 今天的最高預算</label>
+      <select id="budget">
+        <option value="all">不限預算</option>
+        <option value="100">NT$100 以內</option>
+        <option value="150">NT$150 以內</option>
+        <option value="200">NT$200 以內</option>
+        <option value="300">NT$300 以內</option>
+        <option value="custom">自訂最高預算</option>
+      </select>
+      <div id="customBudgetWrap" class="hidden" style="margin-top:8px">
+        <input id="customBudget" type="number" min="1" max="10000" step="10" placeholder="輸入最高金額，例如 180">
+      </div>
+    </div>
+    <div class="field">
+      <label>③ 店家現在營業中？</label>
+      <div class="toggle-row">
+        <label class="toggle"><input type="radio" name="openNow" value="all" checked> 不限</label>
+        <label class="toggle"><input type="radio" name="openNow" value="open"> 只看營業中</label>
+      </div>
+      <p class="note">依內建營業時間判斷。尚未核實時段的店家不會被標示為營業中。</p>
+    </div>
+    <div class="field">
+      <label>④ 用餐方式（可複選）</label>
+      <div class="toggle-row">
+        <label class="toggle"><input id="dineIn" type="checkbox" checked> 內用</label>
+        <label class="toggle"><input id="takeout" type="checkbox" checked> 外帶</label>
+      </div>
+      <p class="note">兩者都勾選代表不限用餐方式；兩者都不勾選時不會有符合結果。</p>
+    </div>
+    <button class="btn btn-primary full" id="applyBtn">套用條件，看看有幾家！</button>
+    <button class="btn btn-ghost full" id="resetFiltersBtn" style="margin-top:9px">清除所有條件</button>
+  </aside>
+
+  <section class="main-card" aria-label="餐廳轉盤與抽選結果">
+    <div class="toolbar">
+      <div class="counter"><span id="count">25</span> <small>家餐廳符合條件</small></div>
+      <span class="status-pill" id="statusPill">準備開飯</span>
+    </div>
+    <div class="wheel-stage">
+      <div class="pointer" aria-hidden="true"></div>
+      <div class="wheel-shell">
+        <canvas id="wheel" width="900" height="900" role="img" aria-label="政大周邊餐廳轉盤"></canvas>
+        <div class="wheel-center"><span>呷<br>啥？</span></div>
+      </div>
+    </div>
+    <div class="wheel-actions">
+      <button class="btn btn-primary" id="spinBtn">🎯 轉啦！決定今天吃啥</button>
+      <button class="btn btn-secondary" id="againBtn" disabled>↻ 再抽一家</button>
+    </div>
+    <div class="message" id="message" role="status" aria-live="polite"></div>
+    <article class="result-card" id="resultCard" aria-live="polite">
+      <div class="result-kicker">✦ 今日命定美食 ✦</div>
+      <h2 id="resultName"></h2>
+      <div class="tags" id="resultTags"></div>
+      <div class="result-details" id="resultDetails"></div>
+      <div class="result-actions">
+        <a class="btn btn-primary" id="mapLink" target="_blank" rel="noopener noreferrer">📍 Google Maps 導航</a>
+        <button class="btn btn-secondary" id="acceptBtn">這家就決定了！</button>
+      </div>
+    </article>
+    <details class="list-panel">
+      <summary>查看本輪候選餐廳（<span id="listCount">25</span> 家）</summary>
+      <div class="restaurant-list" id="restaurantList"></div>
+    </details>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div>政大吃什麼・學生自製美食轉盤</div>
+  <div>店家資訊、價格與營業時間可能變動，出發前請以店家最新公告為準。</div>
+  <div class="source-links">初始名單參考：<a href="https://ifoodie.tw/best/台北市/政治大學" target="_blank" rel="noopener noreferrer">愛食記政大周邊餐廳</a>、<a href="https://tyaward.com.tw/美食/政大美食/" target="_blank" rel="noopener noreferrer">政大周邊美食整理</a>。未標示營業時間的店家不會通過「只看營業中」篩選。</div>
+</footer>
+
+<script>
+/*
+ * 餐廳資料維護區：
+ * hours 格式：以星期日=0、星期一=1 ... 星期六=6，時段使用 24 小時制。
+ * hours:null 表示尚未取得足以可靠判斷每週營業狀態的資料。
+ * 價格是初始估算，請在實際維護時再次核對。
+ */
+const restaurants = [
+ {id:"r01",name:"滇味廚房",categories:["異國料理","麵食"],minPrice:120,maxPrice:180,address:"臺北市文山區指南路二段167號",dineIn:true,takeout:true,hours:null},
+ {id:"r02",name:"老廖牛肉麵",categories:["台式","麵食"],minPrice:130,maxPrice:180,address:"臺北市文山區指南路二段一帶（出發前請確認地圖地址）",dineIn:true,takeout:true,hours:null},
+ {id:"r03",name:"四川飯館",categories:["台式","異國料理"],minPrice:150,maxPrice:300,address:"臺北市文山區指南路二段65號2樓",dineIn:true,takeout:true,hours:{1:[["11:00","14:00"],["17:00","20:00"]],2:[["11:00","14:00"],["17:00","20:00"]],3:[["11:00","14:00"],["17:00","20:00"]],4:[["11:00","14:00"],["17:00","20:00"]],5:[["11:00","14:00"],["17:00","20:00"]],6:[["11:00","14:00"],["17:00","20:00"]],0:[["11:00","14:00"],["17:00","20:00"]]}},
+ {id:"r04",name:"金鮨日式料理",categories:["日式"],minPrice:150,maxPrice:250,address:"臺北市文山區指南路二段（出發前請確認地圖地址）",dineIn:true,takeout:true,hours:null},
+ {id:"r05",name:"舒曼六號餐館 政大店",categories:["異國料理"],minPrice:250,maxPrice:450,address:"臺北市文山區萬壽路6號",dineIn:true,takeout:true,hours:{1:[["11:00","21:30"]],2:[["11:00","21:30"]],3:[["11:00","21:30"]],4:[["11:00","21:30"]],5:[["11:00","21:30"]],6:[["11:00","21:30"]],0:[["11:00","21:30"]]}},
+ {id:"r06",name:"捲毛蜜汁燒烤",categories:["台式"],minPrice:50,maxPrice:180,address:"臺北市文山區政大周邊（常見於校園附近，請先查地圖確認當日位置）",dineIn:false,takeout:true,hours:null},
+ {id:"r07",name:"李白 Breakfast x Coffee",categories:["早餐","飲料／甜點"],minPrice:80,maxPrice:250,address:"臺北市文山區萬壽路25巷7號1樓",dineIn:true,takeout:true,hours:null},
+ {id:"r08",name:"龍角 Dragon Horn",categories:["飲料／甜點"],minPrice:40,maxPrice:90,address:"臺北市文山區指南路二段一帶（出發前請確認地圖地址）",dineIn:false,takeout:true,hours:null},
+ {id:"r09",name:"酪農初茶",categories:["飲料／甜點"],minPrice:50,maxPrice:150,address:"臺北市文山區指南路二段58號",dineIn:false,takeout:true,hours:null},
+ {id:"r10",name:"小公寓",categories:["飲料／甜點","異國料理"],minPrice:150,maxPrice:300,address:"臺北市文山區指南路二段56號2樓",dineIn:true,takeout:false,hours:null},
+ {id:"r11",name:"食鼎鵝肉",categories:["台式","便當"],minPrice:100,maxPrice:220,address:"臺北市文山區萬壽路7號",dineIn:true,takeout:true,hours:null},
+ {id:"r12",name:"小木屋鬆餅 政治大學店",categories:["飲料／甜點","早餐"],minPrice:60,maxPrice:150,address:"臺北市文山區指南路二段97號",dineIn:true,takeout:true,hours:null},
+ {id:"r13",name:"明池豆花 政大店",categories:["飲料／甜點"],minPrice:50,maxPrice:130,address:"臺北市文山區指南路二段56號",dineIn:true,takeout:true,hours:null},
+ {id:"r14",name:"Juicy Bun Burger 就是棒 美式餐廳",categories:["速食","異國料理"],minPrice:180,maxPrice:350,address:"臺北市文山區萬壽路19號",dineIn:true,takeout:true,hours:{1:[["11:30","22:00"]],2:[["11:30","22:00"]],3:[["11:30","22:00"]],4:[["11:30","22:00"]],5:[["11:30","22:00"]],6:[["10:30","22:00"]],0:[["10:30","22:00"]]}},
+ {id:"r15",name:"永康街左撇子",categories:["台式"],minPrice:100,maxPrice:180,address:"臺北市文山區指南路二段119巷10號",dineIn:true,takeout:true,hours:null},
+ {id:"r16",name:"古早味蛋餅飯糰",categories:["早餐","台式"],minPrice:35,maxPrice:90,address:"臺北市文山區萬壽路14號",dineIn:false,takeout:true,hours:null},
+ {id:"r17",name:"飽飽食府",categories:["台式","便當"],minPrice:80,maxPrice:150,address:"臺北市文山區指南路二段119巷117號",dineIn:true,takeout:true,hours:null},
+ {id:"r18",name:"鬼匠拉麵－木柵店",categories:["日式","麵食"],minPrice:130,maxPrice:200,address:"臺北市文山區指南路二段28號",dineIn:true,takeout:true,hours:null},
+ {id:"r19",name:"焿大王／政大店",categories:["台式","麵食"],minPrice:70,maxPrice:130,address:"臺北市文山區指南路二段151號",dineIn:true,takeout:true,hours:null},
+ {id:"r20",name:"Lazy Pasta 慵懶義式廚房文山政大店",categories:["異國料理"],minPrice:200,maxPrice:380,address:"臺北市文山區指南路二段161號",dineIn:true,takeout:true,hours:null},
+ {id:"r21",name:"浪速食鋪",categories:["日式","便當"],minPrice:100,maxPrice:180,address:"臺北市文山區指南路二段119巷16號附近",dineIn:true,takeout:true,hours:{1:[["11:00","14:00"]],2:[["11:00","14:00"]],3:[["11:00","14:00"]],4:[["11:00","14:00"]],5:[["11:00","14:00"]],6:[["11:00","14:00"]],0:[]}},
+ {id:"r22",name:"匠定食食堂",categories:["日式","便當"],minPrice:150,maxPrice:250,address:"臺北市文山區指南路二段207號",dineIn:true,takeout:true,hours:{1:[["11:30","14:00"],["17:30","20:00"]],2:[["11:30","14:00"],["17:30","20:00"]],3:[["11:30","14:00"],["17:30","20:00"]],4:[["11:30","14:00"],["17:30","20:00"]],5:[["11:30","14:00"],["17:30","20:00"]],6:[["11:30","14:00"],["17:30","20:00"]],0:[["11:30","14:00"],["17:30","20:00"]]}},
+ {id:"r23",name:"LI RA 義大利廚房",categories:["異國料理"],minPrice:200,maxPrice:400,address:"臺北市文山區木新路三段67號",dineIn:true,takeout:true,hours:{1:[["11:00","15:00"],["17:00","21:30"]],2:[["11:00","15:00"],["17:00","21:30"]],3:[["11:00","15:00"],["17:00","21:30"]],4:[["11:00","15:00"],["17:00","21:30"]],5:[["11:00","15:00"],["17:00","21:30"]],6:[["11:00","15:00"],["17:00","21:30"]],0:[["11:00","15:00"],["17:00","21:30"]]}},
+ {id:"r24",name:"焱鬼鍋燒專門店－文山三番店",categories:["台式","麵食"],minPrice:120,maxPrice:200,address:"臺北市文山區木新路二段252號",dineIn:true,takeout:true,hours:{1:[["11:00","14:00"],["16:30","21:00"]],2:[["11:00","14:00"],["16:30","21:00"]],3:[["11:00","14:00"],["16:30","21:00"]],4:[["11:00","14:00"],["16:30","21:00"]],5:[["11:00","14:00"],["16:30","21:00"]],6:[["11:00","21:00"]],0:[["11:00","21:00"]]}},
+ {id:"r25",name:"寶杏堂 手切滷肉飯・溫補羊肉湯",categories:["台式","便當"],minPrice:100,maxPrice:220,address:"臺北市文山區木新路三段179號",dineIn:true,takeout:true,hours:{1:[],2:[["16:00","23:00"]],3:[["16:00","23:00"]],4:[["16:00","23:00"]],5:[["16:00","23:00"]],6:[["16:00","23:00"]],0:[["16:00","23:00"]]}}
+];
+
+const colors=["#b64f37","#e6bf72","#6f8560","#d78b54","#f0d9a8","#8e4434","#91a17a","#d7a25b","#ba6a4b","#a7b58c"];
+const canvas=document.getElementById("wheel"),ctx=canvas.getContext("2d");
+const countEl=document.getElementById("count"),listCount=document.getElementById("listCount"),listEl=document.getElementById("restaurantList");
+const spinBtn=document.getElementById("spinBtn"),againBtn=document.getElementById("againBtn"),messageEl=document.getElementById("message");
+const resultCard=document.getElementById("resultCard"),statusPill=document.getElementById("statusPill");
+let candidates=[...restaurants],drawn=new Set(),rotation=0,isSpinning=false,currentWinner=null;
+
+function selectedCategories(){return [...document.querySelectorAll("#categoryChips input:checked")].map(x=>x.value)}
+function getBudget(){
+ const v=document.getElementById("budget").value;
+ if(v==="all")return Infinity;
+ if(v==="custom"){const n=Number(document.getElementById("customBudget").value);return n>0?n:NaN}
+ return Number(v);
+}
+function getOpenMode(){return document.querySelector('input[name="openNow"]:checked').value}
+function localTaipeiParts(date=new Date()){
+ const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Taipei",weekday:"short",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(date);
+ const get=t=>parts.find(p=>p.type===t)?.value;
+ const weekdays={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+ return {day:weekdays[get("weekday")],minutes:Number(get("hour"))*60+Number(get("minute"))};
+}
+function timeToMin(s){const [h,m]=s.split(":").map(Number);return h*60+m}
+function isOpenNow(r,now=new Date()){
+ if(!r.hours)return false;
+ const p=localTaipeiParts(now),today=r.hours[p.day]||[];
+ if(today.some(([a,b])=>{const start=timeToMin(a),end=timeToMin(b);return end>start?p.minutes>=start&&p.minutes<end:p.minutes>=start||p.minutes<end;}))return true;
+ // 支援前一日跨午夜的營業時段
+ const prev=(p.day+6)%7,prevSlots=r.hours[prev]||[];
+ return prevSlots.some(([a,b])=>timeToMin(b)<=timeToMin(a)&&p.minutes<timeToMin(b));
+}
+function matches(r){
+ const cats=selectedCategories(),budget=getBudget();
+ if(cats.length&&!r.categories.some(c=>cats.includes(c)))return false;
+ if(Number.isNaN(budget))return false;
+ if(Number.isFinite(budget)&&r.maxPrice>budget)return false;
+ if(getOpenMode()==="open"&&!isOpenNow(r))return false;
+ const dine=document.getElementById("dineIn").checked,take=document.getElementById("takeout").checked;
+ if(!dine&&!take)return false;
+ if(dine&&!take&&!r.dineIn)return false;
+ if(take&&!dine&&!r.takeout)return false;
+ if(dine&&take&&!r.dineIn&&!r.takeout)return false;
+ return true;
+}
+function refresh(resetDrawn=true){
+ if(isSpinning)return;
+ if(resetDrawn)drawn.clear();
+ candidates=restaurants.filter(matches);
+ countEl.textContent=candidates.length;listCount.textContent=candidates.length;
+ resultCard.classList.remove("show");currentWinner=null;
+ messageEl.classList.remove("show");
+ statusPill.textContent=candidates.length?"準備開飯":"沒有符合條件";
+ spinBtn.disabled=candidates.length===0;
+ againBtn.disabled=candidates.length===0;
+ renderList();drawWheel();
+ if(!candidates.length)showMessage("目前沒有符合條件的店家。試著放寬預算、改選料理類型，或清除部分條件吧！");
+}
+function showMessage(text){messageEl.textContent=text;messageEl.classList.add("show")}
+function renderList(){
+ listEl.innerHTML="";
+ candidates.forEach(r=>{
+  const div=document.createElement("div");div.className="restaurant-item"+(drawn.has(r.id)?" out":"");
+  const name=document.createElement("strong");name.textContent=(drawn.has(r.id)?"✓ ":"")+r.name;
+  const small=document.createElement("small");small.textContent=`${r.categories.join("・")}｜約 NT$${r.minPrice}–${r.maxPrice}`;
+  div.append(name,small);listEl.appendChild(div);
+ });
+}
+function drawWheel(){
+ const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2,r= Math.min(w,h)*.46;
+ ctx.clearRect(0,0,w,h);
+ ctx.beginPath();ctx.arc(cx,cy,r+15,0,Math.PI*2);ctx.fillStyle="#6f2d23";ctx.fill();
+ const arr=candidates;
+ if(!arr.length){
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle="#ead8b4";ctx.fill();
+  ctx.fillStyle="#795b43";ctx.textAlign="center";ctx.font="bold 30px sans-serif";ctx.fillText("先選一下條件",cx,cy+10);return;
+ }
+ const slice=Math.PI*2/arr.length;
+ arr.forEach((item,i)=>{
+  const start=rotation+i*slice-Math.PI/2,end=start+slice;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,end);ctx.closePath();
+  ctx.fillStyle=colors[i%colors.length];ctx.fill();ctx.strokeStyle="#fff0d0";ctx.lineWidth=4;ctx.stroke();
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(start+slice/2);
+  ctx.textAlign="right";ctx.textBaseline="middle";
+  const maxFont=arr.length>24?19:arr.length>17?22:arr.length>11?25:29;
+  ctx.font=`900 ${maxFont}px "Microsoft JhengHei",sans-serif`;
+  ctx.fillStyle=(i%colors.length===1||i%colors.length===4||i%colors.length===6)?"#503323":"#fff8e9";
+  let label=item.name.replace("慵懶義式廚房文山政大店","Lazy Pasta").replace("Juicy Bun Burger 就是棒 美式餐廳","Juicy Bun").replace("焱鬼鍋燒專門店－文山三番店","焱鬼鍋燒").replace("寶杏堂 手切滷肉飯・溫補羊肉湯","寶杏堂滷肉飯");
+  if(label.length>13)label=label.slice(0,12)+"…";
+  ctx.fillText(label,r-24,0,Math.max(75,r*.55));ctx.restore();
+ });
+ ctx.beginPath();ctx.arc(cx,cy,25,0,Math.PI*2);ctx.fillStyle="#fff8e9";ctx.fill();ctx.lineWidth=5;ctx.strokeStyle="#6f2d23";ctx.stroke();
+}
+function formatHours(r){
+ if(!r.hours)return "營業時間待確認";
+ const names=["日","一","二","三","四","五","六"];
+ const groups=[];
+ for(let d=0;d<7;d++){
+  const slots=r.hours[d]||[];
+  const text=slots.length?slots.map(([a,b])=>`${a}–${b}`).join("、"):"公休";
+  groups.push(`週${names[d]} ${text}`);
+ }
+ return groups.join("；");
+}
+function showResult(r){
+ currentWinner=r;resultCard.classList.add("show");
+ document.getElementById("resultName").textContent=r.name;
+ const tags=document.getElementById("resultTags");tags.innerHTML="";
+ [...r.categories,`約 NT$${r.minPrice}–${r.maxPrice}`].forEach(t=>{const span=document.createElement("span");span.className="tag";span.textContent=t;tags.appendChild(span)});
+ const details=document.getElementById("resultDetails");details.innerHTML="";
+ const rows=[["地址",r.address],["營業時間",formatHours(r)],["用餐方式",[r.dineIn?"內用":"",r.takeout?"外帶":""].filter(Boolean).join("／")||"請先確認"],["資料提醒","價格與營業資訊可能變動，出發前請再次確認。"]];
+ rows.forEach(([k,v])=>{const div=document.createElement("div"),b=document.createElement("b"),span=document.createElement("span");b.textContent=k;span.textContent=v;div.append(b,span);details.appendChild(div)});
+ const q=encodeURIComponent(r.name+" "+r.address);
+ document.getElementById("mapLink").href="https://www.google.com/maps/search/?api=1&query="+q;
+ resultCard.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function pickWinner(){
+ const remaining=candidates.filter(r=>!drawn.has(r.id));
+ if(!remaining.length){showMessage("這輪的符合條件餐廳都抽過啦！按「重新開始」即可再抽一次。");spinBtn.disabled=true;againBtn.disabled=true;statusPill.textContent="本輪抽完";return}
+ const winner=remaining[Math.floor(Math.random()*remaining.length)];
+ const idx=candidates.findIndex(r=>r.id===winner.id),slice=Math.PI*2/candidates.length;
+ // pointer is at -90deg; rotate target slice center to top.
+ const targetBase=-(idx+.5)*slice;
+ const currentNormalized=((rotation%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+ let delta=targetBase-currentNormalized;while(delta<0)delta+=Math.PI*2;
+ const finalRotation=rotation+delta+Math.PI*2*5;
+ const startRotation=rotation,start=performance.now(),duration=4200;
+ isSpinning=true;spinBtn.disabled=true;againBtn.disabled=true;statusPill.textContent="轉呀轉呀～";
+ function frame(now){
+  const t=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-t,4);
+  rotation=startRotation+(finalRotation-startRotation)*ease;drawWheel();
+  if(t<1){requestAnimationFrame(frame);return}
+  rotation=finalRotation%(Math.PI*2);drawWheel();isSpinning=false;
+  drawn.add(winner.id);renderList();showResult(winner);
+  statusPill.textContent="命運揭曉！";
+  const remainingAfter=candidates.filter(r=>!drawn.has(r.id)).length;
+  spinBtn.disabled=remainingAfter===0;againBtn.disabled=remainingAfter===0;
+  if(!remainingAfter)showMessage("這輪已經抽完啦！你可以重新開始，讓所有符合條件的餐廳重新參加。");
+ }
+ requestAnimationFrame(frame);
+}
+function resetAll(){
+ if(isSpinning)return;
+ document.querySelectorAll("#categoryChips input").forEach(x=>x.checked=false);
+ document.getElementById("budget").value="all";document.getElementById("customBudget").value="";
+ document.getElementById("customBudgetWrap").classList.add("hidden");
+ document.querySelector('input[name="openNow"][value="all"]').checked=true;
+ document.getElementById("dineIn").checked=true;document.getElementById("takeout").checked=true;
+ drawn.clear();rotation=0;refresh(false);
+}
+document.getElementById("budget").addEventListener("change",()=>{
+ document.getElementById("customBudgetWrap").classList.toggle("hidden",document.getElementById("budget").value!=="custom");
+ refresh();
+});
+document.getElementById("customBudget").addEventListener("input",()=>refresh());
+document.querySelectorAll("#categoryChips input,input[name='openNow'],#dineIn,#takeout").forEach(el=>el.addEventListener("change",()=>refresh()));
+document.getElementById("applyBtn").addEventListener("click",()=>refresh());
+document.getElementById("resetFiltersBtn").addEventListener("click",resetAll);
+spinBtn.addEventListener("click",pickWinner);
+againBtn.addEventListener("click",pickWinner);
+document.getElementById("acceptBtn").addEventListener("click",()=>{if(currentWinner){showMessage(`好耶！今天就去「${currentWinner.name}」開飯吧。出發前記得確認店家是否營業。`);statusPill.textContent="決定吃這家！";}});
+refresh();
+</script>
+</body>
+</html>
